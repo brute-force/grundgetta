@@ -1,0 +1,16 @@
+{
+  "name": "grundgetta",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/*.js --watch --sort"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ask-sdk": "^2.7.0",
+    "superagent": "^5.1.0"
+  }
+}
