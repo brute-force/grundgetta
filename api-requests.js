@@ -4,12 +4,20 @@ const request = require('superagent');
 const getData = async (numberAndStreet, zip) => {
   const uriDSNY = 'https://a827-donatenyc.nyc.gov/DSNYGeoCoder/api/DSNYCollection/CollectionSchedule?address=';
   const address = encodeURIComponent(`${numberAndStreet} ${zip}`);
-  const { body: { RegularCollectionSchedule, RecyclingCollectionSchedule: recyclingDay } } = await request
-    .get(`${uriDSNY}${address}`);
+  const {
+    body: {
+      RegularCollectionSchedule,
+      RecyclingCollectionSchedule: recyclingDay,
+      RoutingTime: {
+        ResidentialRoutingTime: residentialRoutingTime,
+        CommercialRoutingTime: commercialRoutingTime
+      }
+    }
+  } = await request.get(`${uriDSNY}${address}`);
 
   const garbageDays = RegularCollectionSchedule.split(',');
 
-  return { garbageDays, recyclingDay };
+  return { garbageDays, recyclingDay, residentialRoutingTime, commercialRoutingTime };
 };
 
 const isInCorrectTimezone = async (apiAccessToken, deviceId, timeZone) => {
