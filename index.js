@@ -3,12 +3,14 @@ const moment = require('moment-timezone');
 const { getData, isInCorrectTimezone, isHolidaySchedule } = require('./api-requests');
 
 const messages = {
-  WELCOME: 'Garbage!  Ask me \'when is the next garbage day?\' or \'when is the next recycling day?\'',
+  WELCOME: 'Ask me \'when is the next garbage day?\' or \'when is the next recycling day?\'',
   WHAT_DO_YOU_WANT: 'What do you want to ask?',
   NOTIFY_MISSING_PERMISSIONS: 'Please enable Location permissions in the Amazon Alexa app.',
   NO_ADDRESS: 'You don\'t have an address set. Set your address in the companion app.',
-  WRONG_ADDRESS: 'You don\'t have an address set in New York City. Considering moving.',
+  WRONG_ADDRESS: 'You don\'t have an address set in New York City. Consider moving.',
   HOLIDAY_SCHEDULE: 'Sanitation is on holiday schedule. Set your trash out after 4 pm today for pickup tomorrow.',
+  PICKUP_TOMORROW: 'Set garbage curbside after 4 PM today.',
+  PICKUP_TODAY: 'Pickup times are',
   ERROR: 'Oops. Looks like something went wrong.',
   UNRECOGNIZED_REFUSE_TYPE: 'Unrecognized refuse. Have you considered recycling?',
   LOCATION_FAILURE: 'There was an error with the Device Address API. Please try again.',
@@ -93,13 +95,14 @@ const RefuseIntentHandler = {
 
       if (address.addressLine1 === null && address.stateOrRegion === null) {
         reply = responseBuilder.speak(messages.NO_ADDRESS).getResponse();
-      } else if ((await isInCorrectTimezone(apiAccessToken, deviceId)) === false) {
+      } else if ((await isInCorrectTimezone(apiAccessToken, deviceId, TIME_ZONE)) === false) {
         reply = responseBuilder.speak(messages.WRONG_ADDRESS).getResponse();
       } else {
         const refuseSlot = handlerInput.requestEnvelope.request.intent.slots.RefuseType;
         const refuseType = refuseSlot.value.toLowerCase();
 
-        const { garbageDays, recyclingDay } = await getData(address.addressLine1, address.postalCode);
+        const { garbageDays, recyclingDay, residentialRoutingTime } =
+          await getData(address.addressLine1, address.postalCode);
 
         // handle refuse type slot value
         const nextRefuseDay = refuseType === 'garbage'
@@ -112,10 +115,12 @@ const RefuseIntentHandler = {
           if (await isHolidaySchedule()) {
             output = messages.HOLIDAY_SCHEDULE;
           } else {
-            output += `today, ${nextRefuseDay.day}.`;
+            const routing = residentialRoutingTime.replace(/^Daily: /, '').replace(/ - /g, ' to ');
+
+            output += `today, ${nextRefuseDay.day}. ${messages.PICKUP_TODAY} ${routing}.`;
           }
         } else if (nextRefuseDay.daysUntil === 1) {
-          output += `tomorrow, ${nextRefuseDay.day}.`;
+          output += `tomorrow, ${nextRefuseDay.day}. ${messages.PICKUP_TOMORROW}`;
         } else {
           output += `in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
         }
