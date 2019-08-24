@@ -1,0 +1,12 @@
+{
+  "env": {
+    "mocha": true
+  },
+  "plugins": [
+    "mocha"
+  ],
+  "extends": [
+    "semistandard",
+    "plugin:mocha/recommended"
+  ]
+}
