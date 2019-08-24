@@ -6,13 +6,12 @@ const messages = {
   WELCOME: 'Ask me \'when is the next garbage day?\' or \'when is the next recycling day?\'',
   WHAT_DO_YOU_WANT: 'What do you want to ask?',
   NOTIFY_MISSING_PERMISSIONS: 'Please enable Location permissions in the Amazon Alexa app.',
-  NO_ADDRESS: 'You don\'t have an address set. Set your address in the companion app.',
-  WRONG_ADDRESS: 'You don\'t have an address set in New York City. Consider moving.',
-  HOLIDAY_SCHEDULE: 'Sanitation is on holiday schedule. Set your trash out after 4 pm today for pickup tomorrow.',
-  PICKUP_TOMORROW: 'Set garbage curbside after 4 PM today.',
+  NO_ADDRESS: 'Set your address including street number, street, and zip code in the Amazon Alexa app.',
+  WRONG_ADDRESS: 'You don\'t have an address in New York City. Consider moving.',
+  HOLIDAY_SCHEDULE: 'Sanitation is on holiday schedule. Set your RefuseType out after 4 pm today for pickup tomorrow.',
+  PICKUP_TOMORROW: 'Set your RefuseType out after 4 PM today.',
   PICKUP_TODAY: 'Pickup times are',
   ERROR: 'Oops. Looks like something went wrong.',
-  UNRECOGNIZED_REFUSE_TYPE: 'Unrecognized refuse. Have you considered recycling?',
   LOCATION_FAILURE: 'There was an error with the Device Address API. Please try again.',
   GOODBYE: 'Bye!',
   UNHANDLED: 'This skill doesn\'t support that. Please ask something else.',
@@ -20,11 +19,15 @@ const messages = {
   STOP: 'Bye!'
 };
 
-// device address permissions
+// Constants
 const PERMISSIONS = ['read::alexa:device:all:address'];
 const TIME_ZONE = 'America/New_York';
 
-// calculates number of days from today until provided day
+/**
+ * Returns number of days from today until dayTo parameter
+ * @param {string} dayTo day to calculate to
+ * @return {number} number of days between current day and dayTo
+ */
 const getDaysUntil = (dayTo) => {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -38,7 +41,11 @@ const getDaysUntil = (dayTo) => {
   }
 };
 
-// retrieve the next garbage day
+/**
+ * Returns earliest garbage pickup day and days until then
+ * @param {Array} dayTo garbage collection days
+ * @return {Object} object containing earliest garbage pickup day and days until then
+ */
 const getNextGarbageDay = (garbageDays) => {
   // stuff days from now until next garbage day for each valid garbage day
   garbageDays.forEach((garbageDay, i) => {
@@ -53,7 +60,9 @@ const getNextGarbageDay = (garbageDays) => {
   })[0];
 };
 
-/* INTENT HANDLERS */
+/**
+ * Launch Handler
+ */
 const LaunchRequestHandler = {
   canHandle (handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
@@ -66,6 +75,9 @@ const LaunchRequestHandler = {
   }
 };
 
+/**
+ * Custom Intent Handler for retrieving garbage and recycling collection days
+ */
 const RefuseIntentHandler = {
   canHandle (handlerInput) {
     const { request } = handlerInput.requestEnvelope;
@@ -93,34 +105,44 @@ const RefuseIntentHandler = {
 
       let reply;
 
-      if (address.addressLine1 === null && address.stateOrRegion === null) {
-        reply = responseBuilder.speak(messages.NO_ADDRESS).getResponse();
-      } else if ((await isInCorrectTimezone(apiAccessToken, deviceId, TIME_ZONE)) === false) {
+      // disallow devices in time zones outside New York City
+      if ((await isInCorrectTimezone(apiAccessToken, deviceId, TIME_ZONE)) === false) {
         reply = responseBuilder.speak(messages.WRONG_ADDRESS).getResponse();
+      // require number and street address and zip code
+      } else if (address.addressLine1 === null || address.postalCode === null) {
+        reply = responseBuilder.speak(messages.NO_ADDRESS).getResponse();
       } else {
-        const refuseSlot = handlerInput.requestEnvelope.request.intent.slots.RefuseType;
-        const refuseType = refuseSlot.value.toLowerCase();
-
+        // retrieve refuse collection data
         const { garbageDays, recyclingDay, residentialRoutingTime } =
           await getData(address.addressLine1, address.postalCode);
 
-        // handle refuse type slot value
+        // use RefuseType slot value for reply
+        const refuseSlot = handlerInput.requestEnvelope.request.intent.slots.RefuseType;
+        const refuseType = refuseSlot.value.trim().toLowerCase()
+          .replace('trash', 'garbage')
+          .replace('recycle', 'recycling');
+
         const nextRefuseDay = refuseType === 'garbage'
           ? getNextGarbageDay(garbageDays)
           : { day: recyclingDay, daysUntil: getDaysUntil(recyclingDay) };
 
         let output = `Your next ${refuseType} day is `;
 
+        // collection day is today
         if (nextRefuseDay.daysUntil === 0) {
+        // holiday schedule today
           if (await isHolidaySchedule()) {
-            output = messages.HOLIDAY_SCHEDULE;
+            output = messages.HOLIDAY_SCHEDULE.replace('RefuseType', refuseType);
           } else {
-            const routing = residentialRoutingTime.replace(/^Daily: /, '').replace(/ - /g, ' to ');
+            const routingTime = residentialRoutingTime.replace(/^Daily: /, '').replace(/ - /g, ' to ');
 
-            output += `today, ${nextRefuseDay.day}. ${messages.PICKUP_TODAY} ${routing}.`;
+            // add collection times if collection day is today
+            output += `today, ${nextRefuseDay.day}. ${messages.PICKUP_TODAY} ${routingTime}.`;
           }
+        // collection day is tomorrow
         } else if (nextRefuseDay.daysUntil === 1) {
-          output += `tomorrow, ${nextRefuseDay.day}. ${messages.PICKUP_TOMORROW}`;
+          output += `tomorrow, ${nextRefuseDay.day}. ${messages.PICKUP_TOMORROW.replace('RefuseType', refuseType)}`;
+        // collection day is in a few days
         } else {
           output += `in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
         }
@@ -130,18 +152,21 @@ const RefuseIntentHandler = {
 
       return reply;
     } catch (err) {
+      console.log(`error: ${JSON.stringify(err, null, 2)}`);
+
       if (err.name !== 'ServiceError') {
         const reply = responseBuilder.speak(messages.ERROR).getResponse();
         return reply;
       }
-
-      console.log(`error: ${JSON.stringify(err, null, 2)}`);
 
       throw err;
     }
   }
 };
 
+/**
+ * Session Ended Handler
+ */
 const SessionEndedRequestHandler = {
   canHandle (handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
@@ -153,6 +178,9 @@ const SessionEndedRequestHandler = {
   }
 };
 
+/**
+ * Unhandled Intent Handler
+ */
 const UnhandledIntentHandler = {
   canHandle () {
     return true;
@@ -165,6 +193,9 @@ const UnhandledIntentHandler = {
   }
 };
 
+/**
+ * Help Intent Handler
+ */
 const HelpIntentHandler = {
   canHandle (handlerInput) {
     const { request } = handlerInput.requestEnvelope;
@@ -179,6 +210,9 @@ const HelpIntentHandler = {
   }
 };
 
+/**
+ * Cancel Intent Handler
+ */
 const CancelIntentHandler = {
   canHandle (handlerInput) {
     const { request } = handlerInput.requestEnvelope;
@@ -192,6 +226,9 @@ const CancelIntentHandler = {
   }
 };
 
+/**
+ * Stop Intent Handler
+ */
 const StopIntentHandler = {
   canHandle (handlerInput) {
     const { request } = handlerInput.requestEnvelope;
@@ -205,6 +242,9 @@ const StopIntentHandler = {
   }
 };
 
+/**
+ * Error Handler for address and permissions errors
+ */
 const GetAddressErrorHandler = {
   canHandle (handlerInput, error) {
     return error.name === 'ServiceError';
