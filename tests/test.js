@@ -22,6 +22,10 @@ describe('alexa skill test', function () {
     stub.onCall(3).returns(false);
   });
 
+  after(function () {
+    // sinon.restore();
+  });
+
   it('open garbageman', async function () {
     const alexa = va.VirtualAlexa.Builder()
       .handler('index.handler')
@@ -29,7 +33,7 @@ describe('alexa skill test', function () {
       .create();
 
     const result = await alexa.launch();
-    expect(result.prompt()).to.include('Garbage!');
+    expect(result.prompt()).to.include('Ask me');
   });
 
   it('tell me the next garbage day', async function () {
@@ -41,7 +45,7 @@ describe('alexa skill test', function () {
     alexa.addressAPI().returnsFullAddress(address);
 
     await alexa.launch();
-    const reply = await alexa.utter('tell garbageman to tell me the next garbage day');
+    const reply = await alexa.utter('when is the next garbage day');
     expect(reply.prompt()).to.include('Your next garbage day is');
   });
 
@@ -54,7 +58,7 @@ describe('alexa skill test', function () {
     alexa.addressAPI().returnsFullAddress(address);
 
     await alexa.launch();
-    const reply = await alexa.utter('tell garbageman to tell me the next recycling day');
+    const reply = await alexa.utter('when is the next recycling day');
     expect(reply.prompt()).to.include('Your next recycling day is');
   });
 
@@ -67,8 +71,8 @@ describe('alexa skill test', function () {
     alexa.addressAPI().returnsFullAddress(address);
 
     await alexa.launch();
-    const reply = await alexa.utter('tell garbageman to tell me the next garbage day');
-    expect(reply.prompt()).to.include('Considering moving.');
+    const reply = await alexa.utter('when is the next garbage day');
+    expect(reply.prompt()).to.include('Consider moving.');
   });
 
   it('tell me the next recycling day (invalid address)', async function () {
@@ -80,7 +84,7 @@ describe('alexa skill test', function () {
     alexa.addressAPI().returnsFullAddress(address);
 
     await alexa.launch();
-    const reply = await alexa.utter('tell garbageman to tell me the next recycling day');
-    expect(reply.prompt()).to.include('Considering moving.');
+    const reply = await alexa.utter('when is the next recycling day');
+    expect(reply.prompt()).to.include('Consider moving.');
   });
 });
