@@ -1,0 +1,113 @@
+{
+  "interactionModel": {
+      "languageModel": {
+          "invocationName": "garbageman",
+          "intents": [
+              {
+                  "name": "AMAZON.FallbackIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.CancelIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.HelpIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.StopIntent",
+                  "samples": []
+              },
+              {
+                  "name": "AMAZON.NavigateHomeIntent",
+                  "samples": []
+              },
+              {
+                  "name": "RefuseIntent",
+                  "slots": [
+                      {
+                          "name": "RefuseType",
+                          "type": "LIST_OF_REFUSE_TYPES"
+                      }
+                  ],
+                  "samples": [
+                      "tell me the next {RefuseType} day",
+                      "when is the next {RefuseType} day"
+                  ]
+              }
+          ],
+          "types": [
+              {
+                  "name": "LIST_OF_REFUSE_TYPES",
+                  "values": [
+                      {
+                          "id": "recycling",
+                          "name": {
+                              "value": "recycling",
+                              "synonyms": [
+                                  "recycle"
+                              ]
+                          }
+                      },
+                      {
+                          "id": "garbage",
+                          "name": {
+                              "value": "garbage",
+                              "synonyms": [
+                                  "trash",
+                                  "refuse"
+                              ]
+                          }
+                      }
+                  ]
+              }
+          ]
+      },
+      "dialog": {
+          "intents": [
+              {
+                  "name": "RefuseIntent",
+                  "confirmationRequired": false,
+                  "prompts": {},
+                  "slots": [
+                      {
+                          "name": "RefuseType",
+                          "type": "LIST_OF_REFUSE_TYPES",
+                          "confirmationRequired": false,
+                          "elicitationRequired": false,
+                          "prompts": {},
+                          "validations": [
+                              {
+                                  "type": "hasEntityResolutionMatch",
+                                  "prompt": "Slot.Validation.603231201401.386261018122.1274238862874"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ],
+          "delegationStrategy": "ALWAYS"
+      },
+      "prompts": [
+          {
+              "id": "Elicit.Slot.603231201401.386261018122",
+              "variations": [
+                  {
+                      "type": "PlainText",
+                      "value": "Please choose garbage or recycling day."
+                  }
+              ]
+          },
+          {
+              "id": "Slot.Validation.603231201401.386261018122.1274238862874",
+              "variations": [
+                  {
+                      "type": "PlainText",
+                      "value": "Please choose garbage or recycling."
+                  }
+              ]
+          }
+      ]
+  }
+}
