@@ -1,3 +1,4 @@
+# grundgetta
 Amazon Alexa Skill for retrieving garbage and recycling days for your address in New York City. It also informs you if there's a Sanitation holiday if your pickup day is today.  
 
 This requires a valid New York City address and New York time zone settings in your Alexa Companion App, as well as full address Location Permissions.  
