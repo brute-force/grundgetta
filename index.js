@@ -118,7 +118,7 @@ const RefuseIntentHandler = {
 
         // collection day is today
         if (nextRefuseDay.daysUntil === 0) {
-        // holiday schedule today
+          // holiday schedule today
           if (await isHolidaySchedule()) {
             output = messages.SCHEDULE_HOLIDAY;
           } else {
