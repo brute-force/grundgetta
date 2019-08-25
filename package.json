@@ -11,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ask-sdk": "^2.7.0",
+    "ask-sdk-core": "^2.7.0",
+    "ask-sdk-model": "^1.19.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
     "superagent": "^5.1.0"
