@@ -37,6 +37,10 @@ const getNextGarbageDay = (garbageDays) => {
     garbageDays[i] = { day: garbageDay, daysUntil: getDaysUntil(garbageDay) };
   });
 
+  if (garbageDays.length === 1) {
+    return garbageDays[0];
+  }
+
   // get the closest garbage day
   return garbageDays.filter((garbageDay, i) => {
     if (i > 0) {
@@ -92,7 +96,7 @@ const RefuseIntentHandler = {
 
       // disallow devices in time zones outside New York City
       if ((await isInCorrectTimezone(apiAccessToken, deviceId, TIME_ZONE)) === false) {
-        reply = responseBuilder.speak(messages.TIME_ZONE_WRONG).getResponse();
+        reply = responseBuilder.speak(messages.TIME_ZONE_INVALID).getResponse();
       // require number and street address and zip code
       } else if (address.addressLine1 === null || address.postalCode === null) {
         reply = responseBuilder.speak(messages.ADDRESS_MISSING).getResponse();
@@ -117,19 +121,19 @@ const RefuseIntentHandler = {
         if (nextRefuseDay.daysUntil === 0) {
         // holiday schedule today
           if (await isHolidaySchedule()) {
-            output = messages.HOLIDAY_SCHEDULE;
+            output = messages.SCHEDULE_HOLIDAY;
           } else {
             const routingTime = residentialRoutingTime.replace(/^Daily: /, '').replace(/ - /g, ' to ');
 
             // add collection times if collection day is today
-            output = `${messages.NORMAL_SCHEDULE} today. ${messages.PICKUP_TODAY} ${routingTime}.`;
+            output = `${messages.SCHEDULE_NORMAL} today. ${messages.PICKUP_TODAY} ${routingTime}.`;
           }
         // collection day is tomorrow
         } else if (nextRefuseDay.daysUntil === 1) {
-          output = `${messages.NORMAL_SCHEDULE} tomorrow. ${messages.PICKUP_TOMORROW}`;
+          output = `${messages.SCHEDULE_NORMAL} tomorrow. ${messages.PICKUP_TOMORROW}`;
         // collection day is in a few days
         } else {
-          output = `${messages.NORMAL_SCHEDULE} in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
+          output = `${messages.SCHEDULE_NORMAL} in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
         }
 
         reply = responseBuilder.speak(output.replace('RefuseType', refuseType)).getResponse();
