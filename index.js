@@ -1,4 +1,4 @@
-const Alexa = require('ask-sdk');
+const Alexa = require('ask-sdk-core');
 const moment = require('moment-timezone');
 const { getData, isInCorrectTimezone, isHolidaySchedule } = require('./api-requests');
 const messages = require('./messages');
@@ -41,12 +41,11 @@ const getNextGarbageDay = (garbageDays) => {
     return garbageDays[0];
   }
 
-  // get the closest garbage day
-  return garbageDays.filter((garbageDay, i) => {
-    if (i > 0) {
-      return garbageDay.daysUntil < garbageDays[i - 1].daysUntil;
-    }
-  })[0];
+  // find the minimum daysUntil
+  const daysUntilMin = Math.min(...garbageDays.map(({ daysUntil }) => daysUntil));
+
+  // filter by that minimum
+  return garbageDays.filter(({ daysUntil }) => daysUntil === daysUntilMin)[0];
 };
 
 /**
