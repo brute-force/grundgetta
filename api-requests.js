@@ -1,4 +1,5 @@
 const request = require('superagent');
+const AddressNotFoundError = require('./AddressNotFoundError');
 
 /**
  * Returns collection days and times for garbage pickups and recycling day for an address
@@ -9,20 +10,25 @@ const request = require('superagent');
 const getData = async (numberAndStreet, zip) => {
   const uriDSNY = 'https://a827-donatenyc.nyc.gov/DSNYGeoCoder/api/DSNYCollection/CollectionSchedule?address=';
   const address = encodeURIComponent(`${numberAndStreet} ${zip}`);
+
+  const response = await request.get(`${uriDSNY}${address}`);
+
+  if (response.body.FormattedAddress === null) {
+    throw new AddressNotFoundError();
+  }
+
   const {
     body: {
-      RegularCollectionSchedule,
+      RegularCollectionSchedule: garbageDays,
       RecyclingCollectionSchedule: recyclingDay,
       RoutingTime: {
         ResidentialRoutingTime: residentialRoutingTime,
         CommercialRoutingTime: commercialRoutingTime
       }
     }
-  } = await request.get(`${uriDSNY}${address}`);
+  } = response;
 
-  const garbageDays = RegularCollectionSchedule.split(',');
-
-  return { garbageDays, recyclingDay, residentialRoutingTime, commercialRoutingTime };
+  return { garbageDays: garbageDays.split(','), recyclingDay, residentialRoutingTime, commercialRoutingTime };
 };
 
 /**
