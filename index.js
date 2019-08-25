@@ -1,23 +1,8 @@
 const Alexa = require('ask-sdk');
 const moment = require('moment-timezone');
 const { getData, isInCorrectTimezone, isHolidaySchedule } = require('./api-requests');
-
-const messages = {
-  WELCOME: 'Ask me \'when is the next garbage day?\' or \'when is the next recycling day?\'',
-  WHAT_DO_YOU_WANT: 'What do you want to ask?',
-  NOTIFY_MISSING_PERMISSIONS: 'Please enable Location permissions in the Amazon Alexa app.',
-  NO_ADDRESS: 'Set your address including street number, street, and zip code in the Amazon Alexa app.',
-  WRONG_ADDRESS: 'You don\'t have an address in New York City. Consider moving.',
-  HOLIDAY_SCHEDULE: 'Sanitation is on holiday schedule. Set your RefuseType out after 4 pm today for pickup tomorrow.',
-  PICKUP_TOMORROW: 'Set your RefuseType out after 4 PM today.',
-  PICKUP_TODAY: 'Pickup times are',
-  ERROR: 'Oops. Looks like something went wrong.',
-  LOCATION_FAILURE: 'There was an error with the Device Address API. Please try again.',
-  GOODBYE: 'Bye!',
-  UNHANDLED: 'This skill doesn\'t support that. Please ask something else.',
-  HELP: 'You can use this skill by asking something like: when is the next garbage day?',
-  STOP: 'Bye!'
-};
+const messages = require('./messages');
+const AddressNotFoundError = require('./AddressNotFoundError');
 
 // Constants
 const PERMISSIONS = ['read::alexa:device:all:address'];
@@ -107,10 +92,10 @@ const RefuseIntentHandler = {
 
       // disallow devices in time zones outside New York City
       if ((await isInCorrectTimezone(apiAccessToken, deviceId, TIME_ZONE)) === false) {
-        reply = responseBuilder.speak(messages.WRONG_ADDRESS).getResponse();
+        reply = responseBuilder.speak(messages.TIME_ZONE_WRONG).getResponse();
       // require number and street address and zip code
       } else if (address.addressLine1 === null || address.postalCode === null) {
-        reply = responseBuilder.speak(messages.NO_ADDRESS).getResponse();
+        reply = responseBuilder.speak(messages.ADDRESS_MISSING).getResponse();
       } else {
         // retrieve refuse collection data
         const { garbageDays, recyclingDay, residentialRoutingTime } =
@@ -126,37 +111,36 @@ const RefuseIntentHandler = {
           ? getNextGarbageDay(garbageDays)
           : { day: recyclingDay, daysUntil: getDaysUntil(recyclingDay) };
 
-        let output = `Your next ${refuseType} day is `;
+        let output;
 
         // collection day is today
         if (nextRefuseDay.daysUntil === 0) {
         // holiday schedule today
           if (await isHolidaySchedule()) {
-            output = messages.HOLIDAY_SCHEDULE.replace('RefuseType', refuseType);
+            output = messages.HOLIDAY_SCHEDULE;
           } else {
             const routingTime = residentialRoutingTime.replace(/^Daily: /, '').replace(/ - /g, ' to ');
 
             // add collection times if collection day is today
-            output += `today, ${nextRefuseDay.day}. ${messages.PICKUP_TODAY} ${routingTime}.`;
+            output = `${messages.NORMAL_SCHEDULE} today. ${messages.PICKUP_TODAY} ${routingTime}.`;
           }
         // collection day is tomorrow
         } else if (nextRefuseDay.daysUntil === 1) {
-          output += `tomorrow, ${nextRefuseDay.day}. ${messages.PICKUP_TOMORROW.replace('RefuseType', refuseType)}`;
+          output = `${messages.NORMAL_SCHEDULE} tomorrow. ${messages.PICKUP_TOMORROW}`;
         // collection day is in a few days
         } else {
-          output += `in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
+          output = `${messages.NORMAL_SCHEDULE} in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
         }
 
-        reply = responseBuilder.speak(output).getResponse();
+        reply = responseBuilder.speak(output.replace('RefuseType', refuseType)).getResponse();
       }
 
       return reply;
     } catch (err) {
-      console.log(`error: ${JSON.stringify(err, null, 2)}`);
-
-      if (err.name !== 'ServiceError') {
-        const reply = responseBuilder.speak(messages.ERROR).getResponse();
-        return reply;
+      if (err instanceof AddressNotFoundError) {
+        return responseBuilder.speak(messages.ADDRESS_NOT_FOUND).getResponse();
+      } else if (err.name !== 'ServiceError') {
+        return responseBuilder.speak(messages.ERROR).getResponse();
       }
 
       throw err;
@@ -256,6 +240,7 @@ const GetAddressErrorHandler = {
         .withAskForPermissionsConsentCard(PERMISSIONS)
         .getResponse();
     }
+
     return handlerInput.responseBuilder
       .speak(messages.LOCATION_FAILURE)
       .reprompt(messages.LOCATION_FAILURE)
