@@ -1,8 +1,8 @@
 const Alexa = require('ask-sdk-core');
 const moment = require('moment-timezone');
-const { getData, isInCorrectTimezone, isHolidaySchedule } = require('./api-requests');
+const { getData, isInCorrectTimezone, isHolidaySchedule } = require('./util/api-requests');
 const messages = require('./messages');
-const AddressNotFoundError = require('./AddressNotFoundError');
+const AddressNotFoundError = require('./util/AddressNotFoundError');
 
 // Constants
 const PERMISSIONS = ['read::alexa:device:all:address'];
@@ -10,8 +10,8 @@ const TIME_ZONE = 'America/New_York';
 
 /**
  * Returns number of days from today until dayTo parameter
- * @param {string} dayTo day to calculate to
- * @return {number} number of days between current day and dayTo
+ * @param {string} dayTo - day to calculate to
+ * @return {number} - number of days between current day and dayToq
  */
 const getDaysUntil = (dayTo) => {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -27,25 +27,25 @@ const getDaysUntil = (dayTo) => {
 };
 
 /**
- * Returns earliest garbage pickup day and days until then
- * @param {Array} dayTo garbage collection days
- * @return {Object} object containing earliest garbage pickup day and days until then
+ * Returns earliest refuse pickup day and days until then
+ * @param {string[]} dayTo - refuse collection days
+ * @return {{day: string, daysUntil: number}} - earliest refuse pickup day and days until then
  */
-const getNextGarbageDay = (garbageDays) => {
-  // stuff days from now until next garbage day for each valid garbage day
-  garbageDays.forEach((garbageDay, i) => {
-    garbageDays[i] = { day: garbageDay, daysUntil: getDaysUntil(garbageDay) };
+const getNextRefuseDay = (refuseDays) => {
+  // stuff days from now until next refuse day for each valid refuse day
+  refuseDays.forEach((refuseDay, i) => {
+    refuseDays[i] = { day: refuseDay, daysUntil: getDaysUntil(refuseDay) };
   });
 
-  if (garbageDays.length === 1) {
-    return garbageDays[0];
+  if (refuseDays.length === 1) {
+    return refuseDays[0];
   }
 
   // find the minimum daysUntil
-  const daysUntilMin = Math.min(...garbageDays.map(({ daysUntil }) => daysUntil));
+  const daysUntilMin = Math.min(...refuseDays.map(({ daysUntil }) => daysUntil));
 
   // filter by that minimum
-  return garbageDays.filter(({ daysUntil }) => daysUntil === daysUntilMin)[0];
+  return refuseDays.filter(({ daysUntil }) => daysUntil === daysUntilMin)[0];
 };
 
 /**
@@ -100,19 +100,21 @@ const RefuseIntentHandler = {
       } else if (address.addressLine1 === null || address.postalCode === null) {
         reply = responseBuilder.speak(messages.ADDRESS_MISSING).getResponse();
       } else {
-        // retrieve refuse collection data
-        const { garbageDays, recyclingDay, residentialRoutingTime } =
-          await getData(address.addressLine1, address.postalCode);
-
-        // use RefuseType slot value for reply
+        // use RefuseType slot value for reply and standardize slot value synonyms
         const refuseSlot = handlerInput.requestEnvelope.request.intent.slots.RefuseType;
         const refuseType = refuseSlot.value.trim().toLowerCase()
           .replace('trash', 'garbage')
           .replace('recycle', 'recycling');
 
-        const nextRefuseDay = refuseType === 'garbage'
-          ? getNextGarbageDay(garbageDays)
-          : { day: recyclingDay, daysUntil: getDaysUntil(recyclingDay) };
+        // retrieve refuse collection data and get the earliest refuse day
+        const data = await getData(address.addressLine1 + ' ' + address.postalCode);
+        const refuseDays = data[refuseType];
+
+        if (refuseDays.length === 0) {
+          return responseBuilder.speak(messages.SCHEDULE_UNKNOWN.replace('RefuseType', refuseType)).getResponse();
+        }
+
+        const nextRefuseDay = getNextRefuseDay(refuseDays);
 
         let output;
 
@@ -122,10 +124,8 @@ const RefuseIntentHandler = {
           if (await isHolidaySchedule()) {
             output = messages.SCHEDULE_HOLIDAY;
           } else {
-            const routingTime = residentialRoutingTime.replace(/^Daily: /, '').replace(/ - /g, ' to ');
-
             // add collection times if collection day is today
-            output = `${messages.SCHEDULE_NORMAL} today. ${messages.PICKUP_TODAY} ${routingTime}.`;
+            output = `${messages.SCHEDULE_NORMAL} today. ${messages.PICKUP_TODAY} ${data.residentialRoutingTime}.`;
           }
         // collection day is tomorrow
         } else if (nextRefuseDay.daysUntil === 1) {
@@ -135,7 +135,7 @@ const RefuseIntentHandler = {
           output = `${messages.SCHEDULE_NORMAL} in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
         }
 
-        reply = responseBuilder.speak(output.replace('RefuseType', refuseType)).getResponse();
+        reply = responseBuilder.speak(output.replace(/RefuseType/g, refuseType)).getResponse();
       }
 
       return reply;
