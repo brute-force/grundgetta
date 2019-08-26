@@ -1,9 +1,9 @@
 const sinon = require('sinon');
 const expect = require('chai').expect;
 const va = require('virtual-alexa');
-const apiRequests = require('../api-requests');
+const apiRequests = require('../util/api-requests');
 const messages = require('../messages');
-const AddressNotFoundError = require('../AddressNotFoundError');
+const AddressNotFoundError = require('../util/AddressNotFoundError');
 
 const address = {
   addressLine1: '150 Orchard St.',
@@ -17,6 +17,7 @@ const address = {
 };
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const handler = 'index.handler';
 
 describe('alexa skill test', function () {
   let stubIsInCorrectTimezone, stubGetData, stubIsHolidaySchedule;
@@ -34,10 +35,12 @@ describe('alexa skill test', function () {
 
       stubGetData.callsFake(function () {
         return {
-          garbageDays: [
+          garbage: [
             days[new Date().getDay()]
           ],
-          recyclingDay: days[new Date().getDay()],
+          recycling: [
+            days[new Date().getDay()]
+          ],
           residentialRoutingTime: 'Daily: 8:00 AM - 9:00 AM and 6:00 PM - 7:00 PM'
         };
       });
@@ -47,7 +50,7 @@ describe('alexa skill test', function () {
 
     it('when is the next garbage day? (today; regular schedule)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -60,7 +63,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycling day? (today)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -73,7 +76,7 @@ describe('alexa skill test', function () {
 
     it('when is the next trash day? (today)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -86,7 +89,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycle day? (today)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -106,7 +109,7 @@ describe('alexa skill test', function () {
 
     it('when is the next garbage day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -120,7 +123,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycling day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -134,7 +137,7 @@ describe('alexa skill test', function () {
 
     it('when is the next trash day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -148,7 +151,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycle day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -169,10 +172,12 @@ describe('alexa skill test', function () {
         tomorrow.setDate(tomorrow.getDate() + 1);
 
         return {
-          garbageDays: [
+          garbage: [
             days[tomorrow.getDay()]
           ],
-          recyclingDay: days[tomorrow.getDay()],
+          recycling: [
+            days[tomorrow.getDay()]
+          ],
           residentialRoutingTime: 'Daily: 8:00 AM - 9:00 AM and 6:00 PM - 7:00 PM'
         };
       });
@@ -180,7 +185,7 @@ describe('alexa skill test', function () {
 
     it('when is the next garbage day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -193,7 +198,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycling day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -206,7 +211,7 @@ describe('alexa skill test', function () {
 
     it('when is the next trash day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -219,7 +224,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycle day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -240,10 +245,12 @@ describe('alexa skill test', function () {
         dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
 
         return {
-          garbageDays: [
+          garbage: [
             days[dayAfterTomorrow.getDay()]
           ],
-          recyclingDay: days[dayAfterTomorrow.getDay()],
+          recycling: [
+            days[dayAfterTomorrow.getDay()]
+          ],
           residentialRoutingTime: 'Daily: 8:00 AM - 9:00 AM and 6:00 PM - 7:00 PM'
         };
       });
@@ -251,7 +258,7 @@ describe('alexa skill test', function () {
 
     it('when is the next garbage day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -264,7 +271,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycling day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -277,7 +284,7 @@ describe('alexa skill test', function () {
 
     it('when is the next trash day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -290,7 +297,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycle day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -314,7 +321,7 @@ describe('alexa skill test', function () {
 
     it('when is the next garbage day? (invalid time zone)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -328,7 +335,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycling day? (invalid time zone)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -348,7 +355,7 @@ describe('alexa skill test', function () {
 
     it('when is the next garbage day? (address not found)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
@@ -362,7 +369,7 @@ describe('alexa skill test', function () {
 
     it('when is the next recycling day? (address not found)', async function () {
       const alexa = va.VirtualAlexa.Builder()
-        .handler('index.handler')
+        .handler(handler)
         .interactionModelFile('./models/en-US.json')
         .create();
 
