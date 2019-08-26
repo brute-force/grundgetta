@@ -1,11 +1,12 @@
 const request = require('superagent');
 const AddressNotFoundError = require('./AddressNotFoundError');
-const decodeCollectionSchedule = require('./collectionSchedule');
+const { decodeCollectionSchedule } = require('./collectionSchedule');
 
 /**
  * Returns collection schedule for an address
  * @param {string} address - house/building street address and zip code
  * @return {{garbage: string[], recycling: string[], residentialRoutingTime: string}} - collection schedule
+ * @throws {AddressNotFoundError} address not found in DSNY database
  */
 const getData = async (address) => {
   const appId = process.env.GEOCLIENT_API_ID;
@@ -13,7 +14,6 @@ const getData = async (address) => {
 
   const uriGeoclient = 'https://api.cityofnewyork.us/geoclient/v1/search.json' +
     `?input=${encodeURIComponent(address)}&app_id=${appId}&app_key=${appKey}`;
-
   let response = await request.get(uriGeoclient);
 
   // nyc api geoclient/geocoder error
@@ -31,7 +31,6 @@ const getData = async (address) => {
 
   const uriRoutingTime = 'https://www1.nyc.gov/apps/311utils/routingTime' +
     `?district=${sanitationDistrict}&section=${sanitationCollectionSchedulingSectionAndSubsection}`;
-
   response = await request.get(uriRoutingTime);
 
   const {
