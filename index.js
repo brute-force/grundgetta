@@ -1,67 +1,8 @@
 const Alexa = require('ask-sdk-core');
-const moment = require('moment-timezone');
 const { getData, isInCorrectTimezone, isHolidaySchedule } = require('./util/api-requests');
-const messages = require('./messages');
+const { getNextRefuseDay } = require('./util/collectionSchedule');
+const { messages, PERMISSIONS, TIME_ZONE } = require('./constants');
 const AddressNotFoundError = require('./util/AddressNotFoundError');
-
-// Constants
-const PERMISSIONS = ['read::alexa:device:all:address'];
-const TIME_ZONE = 'America/New_York';
-
-/**
- * Returns number of days from today until dayTo parameter
- * @param {string} dayTo - day to calculate to
- * @return {number} - number of days between current day and dayToq
- */
-const getDaysUntil = (dayTo) => {
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-  const indexDayFrom = moment().tz(TIME_ZONE).day();
-  const indexDayTo = days.indexOf(dayTo);
-
-  if (indexDayTo >= indexDayFrom) {
-    return indexDayTo - indexDayFrom;
-  } else {
-    return 7 + (indexDayTo - indexDayFrom);
-  }
-};
-
-/**
- * Returns earliest refuse pickup day and days until then
- * @param {string[]} dayTo - refuse collection days
- * @return {{day: string, daysUntil: number}} - earliest refuse pickup day and days until then
- */
-const getNextRefuseDay = (refuseDays) => {
-  // stuff days from now until next refuse day for each valid refuse day
-  refuseDays.forEach((refuseDay, i) => {
-    refuseDays[i] = { day: refuseDay, daysUntil: getDaysUntil(refuseDay) };
-  });
-
-  if (refuseDays.length === 1) {
-    return refuseDays[0];
-  }
-
-  // find the minimum daysUntil
-  const daysUntilMin = Math.min(...refuseDays.map(({ daysUntil }) => daysUntil));
-
-  // filter by that minimum
-  return refuseDays.filter(({ daysUntil }) => daysUntil === daysUntilMin)[0];
-};
-
-/**
- * Launch Handler
- */
-const LaunchRequestHandler = {
-  canHandle (handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
-  },
-  handle (handlerInput) {
-    return handlerInput.responseBuilder
-      .speak(messages.WELCOME)
-      .reprompt(messages.WHAT_DO_YOU_WANT)
-      .getResponse();
-  }
-};
 
 /**
  * Custom Intent Handler for retrieving garbage and recycling collection days
@@ -148,6 +89,21 @@ const RefuseIntentHandler = {
 
       throw err;
     }
+  }
+};
+
+/**
+ * Launch Handler
+ */
+const LaunchRequestHandler = {
+  canHandle (handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+  },
+  handle (handlerInput) {
+    return handlerInput.responseBuilder
+      .speak(messages.WELCOME)
+      .reprompt(messages.WHAT_DO_YOU_WANT)
+      .getResponse();
   }
 };
 
