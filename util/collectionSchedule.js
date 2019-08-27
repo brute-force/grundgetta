@@ -1,5 +1,5 @@
 const moment = require('moment-timezone');
-const { TIME_ZONE } = require('../constants');
+const { TIME_ZONE } = require('./constants');
 
 /** @constant {string[]} - array of invalid collection codes
     @default

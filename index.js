@@ -1,7 +1,7 @@
 const Alexa = require('ask-sdk-core');
 const { getData, isInCorrectTimezone, isHolidaySchedule } = require('./util/api-requests');
 const { getNextRefuseDay } = require('./util/collectionSchedule');
-const { messages, PERMISSIONS, TIME_ZONE } = require('./constants');
+const { messages, PERMISSIONS, TIME_ZONE } = require('./util/constants');
 const AddressNotFoundError = require('./util/AddressNotFoundError');
 
 /**

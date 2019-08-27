@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const expect = require('chai').expect;
 const va = require('virtual-alexa');
 const apiRequests = require('../util/api-requests');
-const { messages } = require('../constants');
+const { messages } = require('../util/constants');
 const AddressNotFoundError = require('../util/AddressNotFoundError');
 
 const address = {
