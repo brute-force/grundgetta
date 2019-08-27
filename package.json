@@ -45,5 +45,10 @@
       "eslint",
       "git add"
     ]
+  },
+  "semistandard": {
+    "env": [
+      "mocha"
+    ]
   }
 }
