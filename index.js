@@ -76,7 +76,7 @@ const RefuseIntentHandler = {
           output = `${messages.SCHEDULE_NORMAL} in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
         }
 
-        reply = responseBuilder.speak(output.replace(/RefuseType/g, refuseType)).getResponse();
+        reply = responseBuilder.speak(output.replace(/RefuseType/g, refuseType).replace(/Daily: /, '')).getResponse();
       }
 
       return reply;
