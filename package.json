@@ -31,6 +31,7 @@
     "jsdoc": "^3.6.3",
     "lint-staged": "^9.2.3",
     "mocha": "^6.2.0",
+    "semistandard": "^14.0.1",
     "sinon": "^7.4.1",
     "virtual-alexa": "^0.7.2"
   },
