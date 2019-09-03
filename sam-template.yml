@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM Test
+Parameters:
+  GEOCLIENT_API_ID:
+    Type: String
+  GEOCLIENT_APP_KEY:
+    Type: String
+  ALEXA_SKILL_KIT_ID:
+    Type: String
+Mappings:
+  Variables:
+    AlexaSkillKit:
+      Id:
+        Ref: ALEXA_SKILL_KIT_ID
+Resources:
+  FunctionGrundgetta:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: grundgetta-alexa-skill
+      Handler: index.handler
+      CodeUri: s3://grundgetta/index.zip
+      Role: arn:aws:iam::714553042416:role/grundgetta
+      Runtime: nodejs10.x
+      MemorySize: 128
+      Timeout: 7
+      Environment:
+        Variables:
+          GEOCLIENT_API_ID:
+            Ref: GEOCLIENT_API_ID
+          GEOCLIENT_APP_KEY:
+            Ref: GEOCLIENT_APP_KEY
+  FunctionGrundgettaAskPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: FunctionGrundgetta
+    Properties:
+      Action: lambda:InvokeFunction
+      EventSourceToken:
+        Fn::FindInMap:
+        - Variables
+        - AlexaSkillKit
+        - Id
+      FunctionName:
+        Fn::GetAtt:
+        - FunctionGrundgetta
+        - Arn
+      Principal: alexa-appkit.amazon.com
