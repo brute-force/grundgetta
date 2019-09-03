@@ -2,21 +2,9 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: SAM Test
 
-# Parameters:
-#     ALEXA_SKILL_KIT_ID:
-#       Type: 'AWS::SSM::Parameter::Value<String>'
-#       Default: '/grundgetta/ALEXA_SKILL_KIT_ID'
-#     GEOCLIENT_API_ID:
-#       Type: 'AWS::SSM::Parameter::Value<String>'
-#       Default: '/grundgetta/GEOCLIENT_API_ID'
-#     GEOCLIENT_APP_KEY:
-#       Type: 'AWS::SSM::Parameter::Value<String>'
-#       Default: '/grundgetta/GEOCLIENT_APP_KEY'
-
 Mappings:
     Variables:
         AlexaSkillKit:
-            # Id: !Ref ALEXA_SKILL_KIT_ID
             Id: '{{resolve:ssm:/grundgetta/ALEXA_SKILL_KIT_ID:1}}'
 
 Resources:
@@ -25,19 +13,13 @@ Resources:
     Properties:
       FunctionName: grundgetta-alexa-skill
       Handler: index.handler
-      # CodeUri: s3://grundgetta/index.zip
-      CodeUri:
-        Bucket: grundgetta
-        Key: index.zip
-      CodeUri: ./
+      CodeUri: ./deploy
       Role: arn:aws:iam::714553042416:role/grundgetta
       Runtime: nodejs10.x
       MemorySize: 128
       Timeout: 9
       Environment:
         Variables:
-          # GEOCLIENT_API_ID: !Ref GEOCLIENT_API_ID
-          # GEOCLIENT_APP_KEY: !Ref GEOCLIENT_APP_KEY
           GEOCLIENT_API_ID: '{{resolve:ssm:/grundgetta/GEOCLIENT_API_ID:1}}'
           GEOCLIENT_APP_KEY: '{{resolve:ssm:/grundgetta/GEOCLIENT_APP_KEY:1}}'
   FunctionGrundgettaAskPermission:
