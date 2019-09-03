@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+        nodejs: 10
+    commands:
+      - 
+  pre_build:
+    commands:
+      - npm i
+  build:
+    commands:
+      - echo "build started `date`"
+  post_build:
+    commands:
+      - echo "build finished `date`"
