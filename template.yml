@@ -4,11 +4,14 @@ Description: SAM Test
 
 Parameters:
     GEOCLIENT_API_ID:
-      Type: 'String'
+      Type: 'AWS::SSM::Parameter::Value<String>'
+      Default: '/grundgetta/GEOCLIENT_API_ID'
     GEOCLIENT_APP_KEY:
-      Type: 'String'
+      Type: 'AWS::SSM::Parameter::Value<String>'
+      Default: '/grundgetta/GEOCLIENT_APP_KEY'
     ALEXA_SKILL_KIT_ID:
-      Type: 'String'
+      Type: 'AWS::SSM::Parameter::Value<String>'
+      Default: '/grundgetta/ALEXA_SKILL_KIT_ID'
 
 Mappings:
     Variables:
