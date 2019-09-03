@@ -30,7 +30,7 @@ const messages = {
   TIME_ZONE_INVALID: 'Your time zone is not set to New York in the Amazon Alexa App. Consider moving.',
   SCHEDULE_NORMAL: 'Your next RefuseType day is',
   SCHEDULE_HOLIDAY: 'Sanitation is on holiday schedule. Set your RefuseType out after 4 pm today for pickup tomorrow.',
-  SCHEDULE_UNKNOWN: 'Unable to find your RefuseType in the Sanitation database. What even are you throwing out?',
+  SCHEDULE_UNKNOWN: 'Unable to find your RefuseType schedule. What even are you throwing out?',
   PICKUP_TOMORROW: 'Set your RefuseType out after 4 PM today.',
   PICKUP_TODAY: 'Pickup times are',
   ERROR: 'Oops. Looks like something went wrong.',
