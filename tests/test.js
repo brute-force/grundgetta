@@ -18,6 +18,7 @@ const address = {
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const handler = 'index.handler';
+const interactionModelFile = './interactionModel/custom/en-US.json';
 
 describe('alexa skill test', function () {
   let stubIsInCorrectTimezone, stubGetData, stubIsHolidaySchedule;
@@ -51,7 +52,7 @@ describe('alexa skill test', function () {
     it('when is the next garbage day? (today; regular schedule)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -64,7 +65,7 @@ describe('alexa skill test', function () {
     it('when is the next recycling day? (today)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -77,7 +78,7 @@ describe('alexa skill test', function () {
     it('when is the next trash day? (today)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -90,7 +91,7 @@ describe('alexa skill test', function () {
     it('when is the next recycle day? (today)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -110,7 +111,7 @@ describe('alexa skill test', function () {
     it('when is the next garbage day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -124,7 +125,7 @@ describe('alexa skill test', function () {
     it('when is the next recycling day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -138,7 +139,7 @@ describe('alexa skill test', function () {
     it('when is the next trash day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -152,7 +153,7 @@ describe('alexa skill test', function () {
     it('when is the next recycle day? (today; holiday)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -186,7 +187,7 @@ describe('alexa skill test', function () {
     it('when is the next garbage day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -199,7 +200,7 @@ describe('alexa skill test', function () {
     it('when is the next recycling day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -212,7 +213,7 @@ describe('alexa skill test', function () {
     it('when is the next trash day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -225,7 +226,7 @@ describe('alexa skill test', function () {
     it('when is the next recycle day? (tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -259,7 +260,7 @@ describe('alexa skill test', function () {
     it('when is the next garbage day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -272,7 +273,7 @@ describe('alexa skill test', function () {
     it('when is the next recycling day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -285,7 +286,7 @@ describe('alexa skill test', function () {
     it('when is the next trash day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -298,7 +299,7 @@ describe('alexa skill test', function () {
     it('when is the next recycle day? (day after tomorrow)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -322,7 +323,7 @@ describe('alexa skill test', function () {
     it('when is the next garbage day? (invalid time zone)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -336,7 +337,7 @@ describe('alexa skill test', function () {
     it('when is the next recycling day? (invalid time zone)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -356,7 +357,7 @@ describe('alexa skill test', function () {
     it('when is the next garbage day? (address not found)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
@@ -370,7 +371,7 @@ describe('alexa skill test', function () {
     it('when is the next recycling day? (address not found)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)
-        .interactionModelFile('./models/en-US.json')
+        .interactionModelFile(interactionModelFile)
         .create();
 
       alexa.addressAPI().returnsFullAddress(address);
