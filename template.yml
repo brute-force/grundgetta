@@ -17,7 +17,7 @@ Mappings:
     Variables:
         AlexaSkillKit:
             # Id: !Ref ALEXA_SKILL_KIT_ID
-            Id: {{resolve:ssm:/grundgetta/ALEXA_SKILL_KIT_ID:1}}
+            Id: '{{resolve:ssm:/grundgetta/ALEXA_SKILL_KIT_ID:1}}'
 
 Resources:
   FunctionGrundgetta:
@@ -34,8 +34,8 @@ Resources:
         Variables:
           # GEOCLIENT_API_ID: !Ref GEOCLIENT_API_ID
           # GEOCLIENT_APP_KEY: !Ref GEOCLIENT_APP_KEY
-          GEOCLIENT_API_ID: {{resolve:ssm:/grundgetta/GEOCLIENT_API_ID:1}}
-          GEOCLIENT_APP_KEY: {{resolve:ssm:/grundgetta/GEOCLIENT_APP_KEY:1}}
+          GEOCLIENT_API_ID: '{{resolve:ssm:/grundgetta/GEOCLIENT_API_ID:1}}'
+          GEOCLIENT_APP_KEY: '{{resolve:ssm:/grundgetta/GEOCLIENT_APP_KEY:1}}'
   FunctionGrundgettaAskPermission:
       Type: AWS::Lambda::Permission
       DependsOn: FunctionGrundgetta
