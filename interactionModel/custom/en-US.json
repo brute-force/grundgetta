@@ -1,0 +1,102 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "bodega bag",
+      "intents": [
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "RefuseIntent",
+          "slots": [
+            {
+              "name": "RefuseType",
+              "type": "LIST_OF_REFUSE_TYPES"
+            }
+          ],
+          "samples": [
+            "tell me the next {RefuseType} day",
+            "when is the next {RefuseType} day"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "value": "recycling",
+                "synonyms": [
+                  "recycle"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "garbage",
+                "synonyms": [
+                  "trash"
+                ]
+              }
+            }
+          ],
+          "name": "LIST_OF_REFUSE_TYPES"
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "RefuseIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "RefuseType",
+              "type": "LIST_OF_REFUSE_TYPES",
+              "elicitationRequired": false,
+              "confirmationRequired": false,
+              "prompts": {},
+              "validations": [
+                {
+                  "type": "hasEntityResolutionMatch",
+                  "prompt": "Slot.Validation.603231201401.386261018122.1274238862874"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Slot.Validation.603231201401.386261018122.1274238862874",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Please choose garbage or recycling."
+          }
+        ]
+      }
+    ]
+  },
+  "version": "33"
+}
