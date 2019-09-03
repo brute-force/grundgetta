@@ -1,0 +1,61 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:714553042416:function:grundgetta-alexa-skill"
+        },
+        "interfaces": []
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::devices:all:address:full:read"
+      }
+    ],
+    "privacyAndCompliance": {
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "http://www.panix.com/~reuel/privacy.html"
+        }
+      },
+      "allowsPurchases": false,
+      "usesPersonalInfo": true,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false
+    },
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "New York City Garbage and Recycling Pickup",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/b88f/bb8b789910274a7885eecec9953fa78c/APP_ICON?versionId=rP3TGXcdSy6YtZACOD6a0uk7NQfOGB8W&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190903T020739Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190903%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=439f3c9d21506d6e7d33d4f61b49a43510183846a5d38b296ca2d0a4dbf76988",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/fb89/b6736f9485d34cb2b9155c21428ad7d7/APP_ICON_LARGE?versionId=RiMF35zbd0WaBVdTNiMn.lBahceqsshj&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190903T020739Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190903%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=956261207bd4b2284e7c739a3053d65d1960f43bbc80b8273527486c3c1189d3",
+          "summary": "Get the garbage and recycling days for your address in New York City.",
+          "description": "Start this skill by saying \"Alexa, open Bodega Bag\" or \"Alexa, open Bodega Bag and tell me the next garbage day.\" It also informs you if there's a Sanitation holiday if your pickup day is today.\n\nThis requires a valid New York City address and New York time zone settings in your Alexa Companion App.\n\nThis skill is not associated with the New York City Department of Sanitation. \n\nRemember to RECYCLE!",
+          "examplePhrases": [
+            "Alexa, ask Bodega Bag when is the next garbage day?",
+            "Alexa, open Bodega Bag and tell me the next recycling day."
+          ],
+          "keywords": [
+            "garbage",
+            "recycling",
+            "nyc",
+            "sanitation",
+            "dsny",
+            "trash"
+          ],
+          "updatesDescription": ""
+        }
+      },
+      "isAvailableWorldwide": false,
+      "distributionMode": "PUBLIC",
+      "testingInstructions": "enable device location permissions\n\"open bodega bag and tell me the next garbage day\"\n\"open bodega bag tell me the next recycling day\"",
+      "category": "CALENDARS_AND_REMINDERS",
+      "distributionCountries": [
+        "US"
+      ]
+    }
+  }
+}
