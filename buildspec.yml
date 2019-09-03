@@ -7,7 +7,6 @@ phases:
     commands:
       - npm install --production
       - zip -rX index.zip index.js util/ node_modules
-      - aws s3 rb --force s3://grundgetta
       - aws s3 mb s3://grundgetta
       - aws s3 cp index.zip s3://grundgetta/
       - aws cloudformation package --template-file template.yml --output-template-file sam-template.yml --s3-bucket s3://grundgetta
