@@ -29,7 +29,7 @@ Resources:
       Role: arn:aws:iam::714553042416:role/grundgetta
       Runtime: nodejs10.x
       MemorySize: 128
-      Timeout: 7
+      Timeout: 9
       Environment:
         Variables:
           # GEOCLIENT_API_ID: !Ref GEOCLIENT_API_ID
