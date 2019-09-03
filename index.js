@@ -81,6 +81,8 @@ const RefuseIntentHandler = {
 
       return reply;
     } catch (err) {
+      console.log(`error: ${JSON.stringify(err)}`);
+
       if (err instanceof AddressNotFoundError) {
         return responseBuilder.speak(messages.ADDRESS_NOT_FOUND).getResponse();
       } else if (err.name !== 'ServiceError') {
