@@ -3,13 +3,15 @@ phases:
   install:
     runtime-versions:
         nodejs: 10
+  pre_build:
+    commands:
+      - npm i --production
   build:
     commands:
-      - npm install --production
+      - mkdir build
+      - mv -v index.js util node_modules build/
   post_build:
     commands:
-      - mkdir deploy
-      - cp -R index.js util node_modules deploy/
       - aws cloudformation package --template-file template.yml --output-template-file sam-template.yml --s3-bucket grundgetta
 artifacts:
   type: zip

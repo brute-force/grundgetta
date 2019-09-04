@@ -13,7 +13,7 @@ Resources:
     Properties:
       FunctionName: grundgetta-alexa-skill
       Handler: index.handler
-      CodeUri: ./deploy
+      CodeUri: ./build
       Role: arn:aws:iam::714553042416:role/grundgetta
       Runtime: nodejs10.x
       MemorySize: 128
