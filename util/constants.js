@@ -14,6 +14,7 @@
  * @property {string} SCHEDULE_UNKNOWN - collection schedule not found or private
  * @property {string} PICKUP_TOMORROW - collection tomorrow
  * @property {string} PICKUP_TODAY - collection today
+ * @property {string} REPEAT - prefix when user asks to repeat reply
  * @property {string} ERROR - general error
  * @property {string} LOCATION_FAILURE - unable to retrieve device location
  * @property {string} GOODBYE - goodbye intent message
@@ -33,6 +34,7 @@ const messages = {
   SCHEDULE_UNKNOWN: 'Unable to find your RefuseType schedule. What even are you throwing out?',
   PICKUP_TOMORROW: 'Set your RefuseType out after 4 PM today.',
   PICKUP_TODAY: 'Pickup times are',
+  REPEAT: 'Ahem!',
   ERROR: 'Oops! Looks like something went wrong.',
   LOCATION_FAILURE: 'There was an error with the Device Address API. Please try again.',
   GOODBYE: 'Bye!',

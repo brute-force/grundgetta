@@ -49,6 +49,38 @@ describe('alexa skill test', function () {
       stubIsHolidaySchedule.returns(false);
     });
 
+    it('repeat (nothing asked)', async function () {
+      const alexa = va.VirtualAlexa.Builder()
+        .handler(handler)
+        .interactionModelFile(interactionModelFile)
+        .create();
+
+      alexa.addressAPI().returnsFullAddress(address);
+
+      await alexa.launch();
+      let reply = await alexa.utter('repeat');
+      reply = reply.prompt().replace(/<\/?speak>/g, '');
+      expect(reply).to.equal(`${messages.WELCOME}`);
+    });
+
+    it('repeat', async function () {
+      const alexa = va.VirtualAlexa.Builder()
+        .handler(handler)
+        .interactionModelFile(interactionModelFile)
+        .create();
+
+      alexa.addressAPI().returnsFullAddress(address);
+
+      await alexa.launch();
+      let reply = await alexa.utter('when is the next garbage day?');
+      let expected = `${messages.SCHEDULE_NORMAL.replace('RefuseType', 'garbage')} today`;
+      expect(reply.prompt()).to.include(expected);
+
+      reply = await alexa.utter('repeat');
+      expected = `${messages.REPEAT} ${expected}`;
+      expect(reply.prompt()).to.include(expected);
+    });
+
     it('when is the next garbage day? (today; regular schedule)', async function () {
       const alexa = va.VirtualAlexa.Builder()
         .handler(handler)

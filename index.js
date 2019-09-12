@@ -14,7 +14,7 @@ const RefuseIntentHandler = {
     return request.type === 'IntentRequest' && request.intent.name === 'RefuseIntent';
   },
   async handle (handlerInput) {
-    const { requestEnvelope, serviceClientFactory, responseBuilder } = handlerInput;
+    const { requestEnvelope, serviceClientFactory, responseBuilder, attributesManager } = handlerInput;
 
     const consentToken = requestEnvelope.context.System.user.permissions &&
       requestEnvelope.context.System.user.permissions.consentToken;
@@ -42,7 +42,7 @@ const RefuseIntentHandler = {
         reply = responseBuilder.speak(messages.ADDRESS_MISSING).getResponse();
       } else {
         // use RefuseType slot value for reply and standardize slot value synonyms
-        const refuseSlot = handlerInput.requestEnvelope.request.intent.slots.RefuseType;
+        const refuseSlot = requestEnvelope.request.intent.slots.RefuseType;
         const refuseType = refuseSlot.value.trim().toLowerCase()
           .replace('trash', 'garbage')
           .replace('recycle', 'recycling');
@@ -76,12 +76,19 @@ const RefuseIntentHandler = {
           output = `${messages.SCHEDULE_NORMAL} in ${nextRefuseDay.daysUntil} days, on ${nextRefuseDay.day}.`;
         }
 
-        reply = responseBuilder.speak(output.replace(/RefuseType/g, refuseType).replace(/Daily: /, '')).getResponse();
+        output = output.replace(/RefuseType/g, refuseType).replace(/Daily: /, '');
+
+        // store the output
+        const sessionAttributes = attributesManager.getSessionAttributes();
+        sessionAttributes.outputLast = output;
+        attributesManager.setSessionAttributes(sessionAttributes);
+
+        reply = responseBuilder.speak(output).getResponse();
       }
 
       return reply;
     } catch (err) {
-      console.log(`error: ${JSON.stringify(err)}`);
+      // console.log(`error: ${JSON.stringify(err)}`);
 
       if (err instanceof AddressNotFoundError) {
         return responseBuilder.speak(messages.ADDRESS_NOT_FOUND).getResponse();
@@ -91,6 +98,29 @@ const RefuseIntentHandler = {
 
       throw err;
     }
+  }
+};
+
+/**
+ * Repeat Handler
+ */
+const RepeatRequestHandler = {
+  canHandle (handlerInput) {
+    const { request } = handlerInput.requestEnvelope;
+
+    return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.RepeatIntent';
+  },
+  handle (handlerInput) {
+    const { responseBuilder, attributesManager } = handlerInput;
+
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    const output =
+      sessionAttributes.outputLast ? `${messages.REPEAT} ${sessionAttributes.outputLast}` : messages.WELCOME;
+
+    return responseBuilder
+      .speak(output)
+      .reprompt(messages.WELCOME)
+      .getResponse();
   }
 };
 
@@ -117,7 +147,7 @@ const SessionEndedRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
   },
   handle (handlerInput) {
-    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+    // console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
 
     return handlerInput.responseBuilder.getResponse();
   }
@@ -215,6 +245,7 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
     RefuseIntentHandler,
+    RepeatRequestHandler,
     SessionEndedRequestHandler,
     HelpIntentHandler,
     CancelIntentHandler,
