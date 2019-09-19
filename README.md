@@ -8,5 +8,6 @@ Sample utterances:
 "Alexa, open Bodega Bag and tell me the next garbage day."  
 "Alexa, open Bodega Bag and tell me the next recycling day."  
 "Alexa, ask Bodega Bag 'when is the next garbage day?'"  
-
+  
+[Enable in the Alexa Skills Store](https://www.amazon.com/York-City-Garbage-Recycling-Pickup/dp/B07XWFDVSW/)  
 ![image](https://user-images.githubusercontent.com/5098101/63646423-628ea400-c6e0-11e9-90c8-404fb68826fa.png)
